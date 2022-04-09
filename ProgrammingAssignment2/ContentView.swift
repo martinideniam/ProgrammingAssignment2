@@ -17,14 +17,14 @@ struct ContentView: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 80, maximum: 100))], alignment: .center) {
                     ForEach(viewModel.cards) { card in
                         if !card.isMatched {
-                            CardView(card: card)
+                            CardView(card: card, colorOfTheme: viewModel.theme.color)
                                 .aspectRatio(2/2.5, contentMode: .fit)
                                 .padding(2)
                                 .onTapGesture {
                                     viewModel.chooseCards(card: card)
                                 }
                         } else {
-                            CardView(card: card)
+                            CardView(card: card, colorOfTheme: viewModel.theme.color)
                                 .aspectRatio(2/2.5, contentMode: .fit)
                                 .padding(2)
                                 .foregroundColor(.green)
@@ -40,13 +40,14 @@ struct ContentView: View {
                 .padding(.leading, 20)
                 .padding(.trailing, 20)
             Spacer()
-            NewGameButton(newGame: viewModel.newGame)
+            NewGameButton(newGame: viewModel.newGame, color: viewModel.theme.color)
         }
     }
 }
 
 struct CardView: View {
     var card: RA2Model<String>.Card
+    var colorOfTheme: Theme.Colors
     var body: some View {
         ZStack {
             if card.isFacedUp {
@@ -55,23 +56,41 @@ struct CardView: View {
                     .padding(20)
             } else {
                 RoundedRectangle(cornerRadius: 25)
+                    .foregroundColor(CardView.interpretColorEnum(colorOfTheme))
                 RoundedRectangle(cornerRadius: 25)
                     .stroke()
-                    .foregroundColor(.red)
+                    .foregroundColor(.black)
             }
+        }
+    }
+    static func interpretColorEnum(_ color: Theme.Colors) -> Color {
+        switch color {
+            case .red:
+                return Color.red
+            case .blue:
+                return Color.blue
+            case .green:
+                return Color.green
+            case .gray:
+                return Color.gray
+            case .orange:
+                return Color.orange
+            case .pink:
+                return Color.pink
         }
     }
 }
 
 struct NewGameButton: View {
     var newGame: () -> Void
+    var color: Theme.Colors
     var body: some View {
         Button {
             newGame()
         } label: {
             Text("New Game")
                 .font(.system(size: 30, weight: .bold, design: .rounded))
-                .foregroundColor(.red)
+                .foregroundColor(CardView.interpretColorEnum(color))
         }
 
     }
@@ -89,6 +108,8 @@ struct Header: View {
         }
     }
 }
+
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
